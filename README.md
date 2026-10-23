@@ -23,8 +23,6 @@ The tier limits are active-link slots, not lifetime upload counts. A slot become
 5. For local development, copy `.env.example` to `.dev.vars`, replace both placeholder values, and run `npm run dev`. Wrangler reads `.dev.vars`; it does not load `.env.example` directly. Both files are excluded from git except the example template.
 6. Add a Cloudflare rate-limiting rule for `POST /api/login` before sharing the uploader publicly.
 
-The supplied R2 endpoint, `https://047aaef8e60d399ed5c79bbcbdb15255.r2.cloudflarestorage.com`, is the account's S3-compatible API endpoint, not a public video URL. Cloudflare Workers should use the R2 binding; the Worker streams uploads into `video-server` and serves video ranges through the Worker so playback can seek without exposing bucket credentials.
-
 ## Share pages
 
 Each `/v/<id>` page has Open Graph video fields, Twitter player fields, a share title and description, and a JPEG preview when the uploader's browser can decode the video. Videos are served with byte-range support for seeking. Links are intentionally public and should be treated as unlisted, not access-controlled.
