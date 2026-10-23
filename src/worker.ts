@@ -13,6 +13,7 @@ interface Env {
   VIDEO_REGISTRY: DurableObjectNamespace<VideoRegistry>;
   UPLOAD_PASSWORD: string;
   SESSION_SECRET: string;
+  PUBLIC_ORIGIN?: string;
 }
 
 interface VideoRecord {
@@ -121,9 +122,14 @@ async function hasSession(request: Request, secret: string): Promise<boolean> {
   return constantTimeEqual(value, expected);
 }
 
-function sameOrigin(request: Request): boolean {
+function sameOrigin(request: Request, publicOrigin?: string): boolean {
   const origin = request.headers.get("Origin");
-  return origin === new URL(request.url).origin;
+  try {
+    const expectedOrigin = publicOrigin ? new URL(publicOrigin).origin : new URL(request.url).origin;
+    return origin === expectedOrigin;
+  } catch {
+    return false;
+  }
 }
 
 function parseRange(value: string, size: number): { offset: number; length: number; end: number } | null {
@@ -257,7 +263,7 @@ async function handleApi(request: Request, env: Env): Promise<Response> {
   }
 
   if (pathname === "/api/login" && request.method === "POST") {
-    if (!sameOrigin(request)) return json({ error: "Invalid request origin." }, 403);
+    if (!sameOrigin(request, env.PUBLIC_ORIGIN)) return json({ error: "Invalid request origin." }, 403);
     let body: { password?: unknown };
     try {
       body = (await request.json()) as { password?: unknown };
@@ -282,7 +288,7 @@ async function handleApi(request: Request, env: Env): Promise<Response> {
   }
 
   if (pathname === "/api/logout" && request.method === "POST") {
-    if (!sameOrigin(request)) return json({ error: "Invalid request origin." }, 403);
+    if (!sameOrigin(request, env.PUBLIC_ORIGIN)) return json({ error: "Invalid request origin." }, 403);
     return json(
       { ok: true },
       200,
@@ -293,7 +299,7 @@ async function handleApi(request: Request, env: Env): Promise<Response> {
   if (!(await hasSession(request, env.SESSION_SECRET))) {
     return json({ error: "Sign in to continue." }, 401);
   }
-  if (!sameOrigin(request)) return json({ error: "Invalid request origin." }, 403);
+  if (!sameOrigin(request, env.PUBLIC_ORIGIN)) return json({ error: "Invalid request origin." }, 403);
 
   if (pathname === "/api/uploads" && request.method === "GET") {
     const state = await registryFetch<{ videos: VideoRecord[] }>(env, "/state");

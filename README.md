@@ -19,9 +19,10 @@ The tier limits are active-link slots, not lifetime upload counts. A slot become
 	npx wrangler secret put SESSION_SECRET
 	```
 
-4. Run `npm run dev` for local development or `npm run deploy` to deploy. Apply the Durable Object migration on the first deployment; Wrangler prompts for this when needed.
-5. For local development, copy `.env.example` to `.dev.vars`, replace both placeholder values, and run `npm run dev`. Wrangler reads `.dev.vars`; it does not load `.env.example` directly. Both files are excluded from git except the example template.
-6. Add a Cloudflare rate-limiting rule for `POST /api/login` before sharing the uploader publicly.
+4. If a reverse proxy changes the request host or scheme, set `PUBLIC_ORIGIN` to the public site origin (for example, `https://uploader.example.com`). Add it under `vars` in `wrangler.jsonc` for deployment, or to `.dev.vars` locally. Leave it unset when the Worker is reached directly at its public URL.
+5. Run `npm run dev` for local development or `npm run deploy` to deploy. Apply the Durable Object migration on the first deployment; Wrangler prompts for this when needed.
+6. For local development, copy `.env.example` to `.dev.vars`, replace both placeholder values, and run `npm run dev`. Wrangler reads `.dev.vars`; it does not load `.env.example` or `.env` directly. Both files are excluded from git except the example template.
+7. Add a Cloudflare rate-limiting rule for `POST /api/login` before sharing the uploader publicly.
 
 ## Share pages
 
