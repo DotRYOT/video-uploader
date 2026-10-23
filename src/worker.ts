@@ -366,6 +366,7 @@ async function handleApi(request: Request, env: Env): Promise<Response> {
         controller.enqueue(chunk);
       },
     });
+    let stage = "R2 write";
     try {
       const object = await env.VIDEOS_BUCKET.put(`videos/${id}`, request.body.pipeThrough(limiter), {
         httpMetadata: { contentType },
@@ -373,15 +374,33 @@ async function handleApi(request: Request, env: Env): Promise<Response> {
       });
       objectWritten = true;
       if (bytesWritten !== length || object.size !== length) throw new Error("Upload size mismatch.");
+      stage = "registry completion";
       const completed = await registryFetch<{ ok: boolean }>(env, "/complete", {
         method: "POST",
         body: JSON.stringify({ id }),
       });
       if (!completed.ok) throw new Error("Upload reservation expired.");
       return json({ id, shareUrl: `${new URL(request.url).origin}/v/${id}`, expiresAt: video.expiresAt }, 201);
-    } catch {
-      if (objectWritten) await env.VIDEOS_BUCKET.delete(`videos/${id}`);
-      await registryFetch(env, "/release", { method: "POST", body: JSON.stringify({ id }) });
+    } catch (error) {
+      console.error("Video upload failed", {
+        id,
+        stage,
+        bytesWritten,
+        expectedBytes: length,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      if (objectWritten) {
+        try {
+          await env.VIDEOS_BUCKET.delete(`videos/${id}`);
+        } catch (cleanupError) {
+          console.error("Video upload object cleanup failed", cleanupError);
+        }
+      }
+      try {
+        await registryFetch(env, "/release", { method: "POST", body: JSON.stringify({ id }) });
+      } catch (cleanupError) {
+        console.error("Video upload reservation cleanup failed", cleanupError);
+      }
       return json({ error: "Upload failed. Check the file and try again." }, 500);
     }
   }
