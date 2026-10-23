@@ -124,6 +124,7 @@ async function hasSession(request: Request, secret: string): Promise<boolean> {
 
 function sameOrigin(request: Request, publicOrigin?: string): boolean {
   const origin = request.headers.get("Origin");
+  if (origin === null && (request.method === "GET" || request.method === "HEAD")) return true;
   try {
     const expectedOrigin = publicOrigin ? new URL(publicOrigin).origin : new URL(request.url).origin;
     return origin === expectedOrigin;
