@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#090b0b">
+    <meta name="description" content="Share temporary video links with Video Drop.">
+    <title>Video Drop · Upload</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Video Drop home"><span class="brand-mark">v</span>video drop</a>
+      <div class="topbar-right">
+        <span class="connection"><span class="status-dot"></span><span id="connection-label">CONNECTING</span></span>
+        <button class="quiet-button" id="logout-button" type="button" hidden>Sign out</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="login-view" id="login-view" hidden>
+        <div class="login-copy">
+          <p class="eyebrow">A SMALL, TEMPORARY VIDEO HOST</p>
+          <h1>Good to<br>see you.</h1>
+          <p class="muted">Sign in with the shared upload password.</p>
+        </div>
+        <form class="login-form" id="login-form">
+          <label for="password">Upload password</label>
+          <input id="password" name="password" type="password" autocomplete="current-password" required>
+          <button class="primary-button" type="submit">Enter workspace <span aria-hidden="true">↗</span></button>
+          <p class="form-message" id="login-message" role="status"></p>
+        </form>
+      </section>
+
+      <div class="app-view" id="app-view" hidden>
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">UPLOAD WORKSPACE <span class="eyebrow-separator">/</span> <span id="today-label"></span></p>
+            <h1>New video<span class="heading-period">.</span></h1>
+          </div>
+          <p class="max-size">MAX FILE <strong id="max-size">100 MB</strong></p>
+        </div>
+
+        <section class="quota-strip" aria-label="Available video slots">
+          <div class="quota-heading">ACTIVE SLOTS</div>
+          <div class="quota-list" id="quota-list"></div>
+        </section>
+
+        <div class="content-grid">
+          <section class="upload-section" aria-labelledby="upload-heading">
+            <div class="section-title">
+              <h2 id="upload-heading">Prepare a link</h2>
+              <span class="step-number">01</span>
+            </div>
+            <form id="upload-form">
+              <label class="dropzone" id="dropzone" for="video-file">
+                <input id="video-file" name="video" type="file" accept="video/mp4,video/webm,video/quicktime,video/x-matroska,.mkv" required>
+                <span class="drop-icon" aria-hidden="true">↑</span>
+                <span class="drop-copy"><strong id="file-label">Choose a video</strong><span id="file-subtext">MP4, WebM, MOV or MKV</span></span>
+                <span class="browse-label">BROWSE</span>
+              </label>
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="video-title">Title</label>
+                  <input id="video-title" name="title" type="text" maxlength="100" placeholder="A clear name for this video">
+                </div>
+                <div class="field expiry-field">
+                  <label for="video-tier">Link lifetime</label>
+                  <select id="video-tier" name="tier" required></select>
+                </div>
+              </div>
+              <div class="field description-field">
+                <label for="video-description">Description <span>OPTIONAL</span></label>
+                <textarea id="video-description" name="description" rows="2" maxlength="280" placeholder="A little context for the person watching"></textarea>
+              </div>
+
+              <div class="upload-footer">
+                <p class="form-message" id="upload-message" role="status" aria-live="polite"></p>
+                <button class="primary-button upload-button" id="upload-button" type="submit" disabled>Upload video <span aria-hidden="true">↗</span></button>
+              </div>
+              <div class="progress-wrap" id="progress-wrap" hidden>
+                <div class="progress-label"><span id="progress-label">Uploading</span><span id="progress-value">0%</span></div>
+                <progress id="upload-progress" max="100" value="0">0%</progress>
+              </div>
+              <div class="result-link" id="result-link" hidden></div>
+            </form>
+          </section>
+
+          <section class="links-section" aria-labelledby="links-heading">
+            <div class="section-title">
+              <h2 id="links-heading">Your links</h2>
+              <span class="link-count" id="link-count">0</span>
+            </div>
+            <div class="link-list" id="link-list" aria-live="polite">
+              <p class="empty-state">Your active uploads will appear here.</p>
+            </div>
+            <p class="list-footnote">Expired videos are removed automatically.</p>
+          </section>
+        </div>
+      </div>
+    </main>
+    <footer class="site-footer"><span>VIDEO DROP <span class="footer-dot">/</span> TEMPORARY BY DESIGN</span><span>LINKS EXPIRE ON SCHEDULE</span></footer>
+  </body>
+</html>

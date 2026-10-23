@@ -1,0 +1,12 @@
+:root { color-scheme: dark; --ink: #090b0b; --line: #2b3030; --text: #f1f4ef; --muted: #a6aea8; --acid: #c9f36a; --sans: "Space Grotesk", "Avenir Next", sans-serif; --mono: "DM Mono", "SFMono-Regular", monospace; }
+* { box-sizing: border-box; }
+body { min-height: 100vh; margin: 0; padding: 0 5vw; display: grid; place-items: center; background: var(--ink); color: var(--text); font-family: var(--sans); }
+.watch { width: min(960px, 100%); padding: 42px 0 56px; }
+.wordmark { display: inline-flex; align-items: center; gap: 7px; color: var(--text); font-size: 13px; font-weight: 700; text-decoration: none; }
+.wordmark span { color: var(--acid); }
+.eyebrow { margin: 58px 0 12px; color: var(--muted); font: 10px var(--mono); }
+h1 { max-width: 850px; margin: 0 0 9px; font-size: clamp(32px, 6vw, 58px); font-weight: 500; line-height: 1.06; overflow-wrap: anywhere; }
+.description { max-width: 650px; margin: 0 0 24px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+video { display: block; width: 100%; max-height: min(66vh, 680px); margin-top: 24px; background: #000; border: 1px solid var(--line); }
+.expiry { margin: 15px 0 0; color: var(--muted); font: 10px var(--mono); }
+@media (max-width: 600px) { .watch { padding: 26px 0 42px; } .eyebrow { margin-top: 42px; } .description { font-size: 13px; } video { margin-top: 18px; } }
