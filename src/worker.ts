@@ -249,6 +249,15 @@ function sharePage(video: VideoRecord, url: URL): Response {
   return secureHtml(html);
 }
 
+function decodeHeaderValue(value: string | null): string {
+  if (!value) return "";
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return "";
+  }
+}
+
 async function handleApi(request: Request, env: Env): Promise<Response> {
   const { pathname } = new URL(request.url);
 
@@ -323,8 +332,8 @@ async function handleApi(request: Request, env: Env): Promise<Response> {
 
     const id = crypto.randomUUID();
     const now = Date.now();
-    const title = (request.headers.get("X-Upload-Title") ?? "").trim().slice(0, 100) || "Untitled video";
-    const description = (request.headers.get("X-Upload-Description") ?? "").trim().slice(0, 280);
+    const title = decodeHeaderValue(request.headers.get("X-Upload-Title")).trim().slice(0, 100) || "Untitled video";
+    const description = decodeHeaderValue(request.headers.get("X-Upload-Description")).trim().slice(0, 280);
     const video: VideoRecord = {
       id,
       tier: tierId,

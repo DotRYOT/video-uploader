@@ -286,8 +286,8 @@ uploadForm.addEventListener("submit", async (event) => {
     const uploaded = await xhrUpload("/api/upload", file, {
       "Content-Type": file.type || "video/mp4",
       "X-Upload-Tier": tier.id,
-      "X-Upload-Title": document.querySelector("#video-title").value,
-      "X-Upload-Description": document.querySelector("#video-description").value,
+      "X-Upload-Title": encodeURIComponent(document.querySelector("#video-title").value),
+      "X-Upload-Description": encodeURIComponent(document.querySelector("#video-description").value),
     }, (percent) => {
       uploadProgress.value = percent;
       document.querySelector("#progress-value").textContent = `${percent}%`;
