@@ -368,11 +368,17 @@ async function handleApi(request: Request, env: Env): Promise<Response> {
     });
     let stage = "R2 write";
     try {
-      const object = await env.VIDEOS_BUCKET.put(`videos/${id}`, request.body.pipeThrough(limiter), {
+      const fixedLength = new FixedLengthStream(length);
+      const writePromise = request.body.pipeThrough(limiter).pipeTo(fixedLength.writable);
+      const objectPromise = env.VIDEOS_BUCKET.put(`videos/${id}`, fixedLength.readable, {
         httpMetadata: { contentType },
         customMetadata: { id, tier: tierId },
       });
-      objectWritten = true;
+      const [objectResult, writeResult] = await Promise.allSettled([objectPromise, writePromise]);
+      objectWritten = objectResult.status === "fulfilled";
+      if (writeResult.status === "rejected") throw writeResult.reason;
+      if (objectResult.status === "rejected") throw objectResult.reason;
+      const object = objectResult.value;
       if (bytesWritten !== length || object.size !== length) throw new Error("Upload size mismatch.");
       stage = "registry completion";
       const completed = await registryFetch<{ ok: boolean }>(env, "/complete", {
